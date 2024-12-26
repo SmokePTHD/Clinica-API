@@ -24,18 +24,18 @@ export class UserResolver {
 
       return {
         uid,
-        address: userData?.address || "",
+        address: userData?.address,
         birthDate: userData?.birthDate?.toDate
           ? userData.birthDate.toDate()
           : null,
-        email: userData?.email || "",
-        name: userData?.name || "",
-        nif: userData?.nif || 0,
-        note: userData?.note || "",
-        phone: userData?.phone || "",
-        role: userData?.role || "",
-        sex: userData?.sex || "",
-        status: userData?.status || "",
+        email: userData?.email,
+        name: userData?.name,
+        nif: userData?.nif,
+        note: userData?.note,
+        phone: userData?.phone,
+        role: userData?.role,
+        sex: userData?.sex,
+        status: userData?.status,
       };
     } catch (error: any) {
       throw new Error(`Erro ao buscar dados do utilizador: ${error.message}`);
