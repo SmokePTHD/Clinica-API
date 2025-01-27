@@ -1,8 +1,10 @@
 # Modules
 node_modules
+package-lock.json
 
 # Enviroment
 .env
+.gitignore
 
 #KEY
 src/config/*.json
