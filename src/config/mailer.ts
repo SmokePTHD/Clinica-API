@@ -1,16 +1,13 @@
+import formData from "form-data";
+import Mailgun from "mailgun.js";
 import dotenv from "dotenv";
-import nodemailer from "nodemailer";
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: Number(process.env.MAIL_PORT),
-  secure: true,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASSWORD,
-  },
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.MAIL_API_KEY,
 });
 
-export default transporter;
+export default mg;

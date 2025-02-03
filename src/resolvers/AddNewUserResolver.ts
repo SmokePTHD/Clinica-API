@@ -31,7 +31,6 @@ export class AddNewUserResolver {
                 note: note,
                 phone: phone,
                 role: role,
-                uid: userRecord.uid,
             });
 
             return {

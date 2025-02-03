@@ -4,9 +4,6 @@ import { Field, InputType } from "type-graphql";
 export class AddUserInputs {
 
     @Field()
-    uid: string;
-
-    @Field()
     address: string;
 
     @Field()

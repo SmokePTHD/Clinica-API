@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 import { Arg, Mutation, Resolver } from "type-graphql";
 import { getAuth } from "firebase-admin/auth";
+
 import { ResetPasswordInput } from "../dtos/inputs/ResetPasswordInput"; 
 import { ResetPassword } from "../dtos/model/ResetPasswordModel";
-import transporter from "../config/mailer";
+
+import mg from "../config/mailer";
 
 dotenv.config();
 
@@ -19,9 +21,9 @@ export class ResetUsersPassword {
       const resetLink = await this.auth.generatePasswordResetLink(email);
       console.log("Link de redefinição de senha:", resetLink);
 
-      await transporter.sendMail({
-        from: '"Clínica Rio Este" <${process.env.MAIL_USER}>',
-        to: email,
+      await mg.messages.create(process.env.MAIL_HOST, {
+        from: `"Clínica Rio Este" <${process.env.MAIL_USER}>`,
+        to: [email],
         subject: "Redefinição de senha",
         text: `Clique no link para redefinir sua senha: ${resetLink}`,
         html: `<p>Clique no link para redefinir sua senha: <a href="${resetLink}">${resetLink}</a></p>`,
