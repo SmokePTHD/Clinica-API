@@ -11,12 +11,20 @@ import { ResetUsersPassword } from "./resolvers/ResetPasswordResolver";
 import { UserResolver } from "./resolvers/GetUserResolver";
 import { GetUsersByRoleResolver } from "./resolvers/GetUsersByRoleResolver";
 import { AddNewUserResolver } from "./resolvers/AddNewUserResolver";
+import { AddNewScheduleResolver } from "./resolvers/AddNewScheduleResolver";
 
 dotenv.config();
 
 async function startServer() {
   const schema = await buildSchema({
-    resolvers: [AuthEmailResolver, UserResolver, ResetUsersPassword, GetUsersByRoleResolver, AddNewUserResolver],
+    resolvers: [
+      AuthEmailResolver,
+      UserResolver,
+      ResetUsersPassword,
+      GetUsersByRoleResolver,
+      AddNewUserResolver,
+      AddNewScheduleResolver,
+    ],
   });
 
   initializeFirebase();

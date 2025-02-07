@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { Arg, Mutation, Resolver } from "type-graphql";
 import { getAuth } from "firebase-admin/auth";
 
-import { ResetPasswordInput } from "../dtos/inputs/ResetPasswordInput"; 
+import { ResetPasswordInput } from "../dtos/inputs/ResetPasswordInput";
 import { ResetPassword } from "../dtos/model/ResetPasswordModel";
 
 import mg from "../config/mailer";
@@ -19,14 +19,16 @@ export class ResetUsersPassword {
   ): Promise<ResetPassword> {
     try {
       const resetLink = await this.auth.generatePasswordResetLink(email);
-      console.log("Link de redefinição de senha:", resetLink);
 
       await mg.messages.create(process.env.MAIL_HOST, {
         from: `"Clínica Rio Este" <${process.env.MAIL_USER}>`,
         to: [email],
         subject: "Redefinição de senha",
-        text: `Clique no link para redefinir sua senha: ${resetLink}`,
-        html: `<p>Clique no link para redefinir sua senha: <a href="${resetLink}">${resetLink}</a></p>`,
+        template: "reset password",
+        "h:X-Mailgun-Variables": JSON.stringify({
+          reset_password_link: resetLink,
+          year: "2025",
+        }),
       });
 
       return {
