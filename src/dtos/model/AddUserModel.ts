@@ -2,9 +2,9 @@ import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class AddUserModel {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field()
-    message: string;
+  @Field()
+  message: string;
 }

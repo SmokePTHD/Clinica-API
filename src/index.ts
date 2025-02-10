@@ -12,6 +12,7 @@ import { UserResolver } from "./resolvers/GetUserResolver";
 import { GetUsersByRoleResolver } from "./resolvers/GetUsersByRoleResolver";
 import { AddNewUserResolver } from "./resolvers/AddNewUserResolver";
 import { AddNewScheduleResolver } from "./resolvers/AddNewScheduleResolver";
+import { GetUserProfilePictureResolver } from "./resolvers/GetUserProfilePictureResolver";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ async function startServer() {
       UserResolver,
       ResetUsersPassword,
       GetUsersByRoleResolver,
+      GetUserProfilePictureResolver,
       AddNewUserResolver,
       AddNewScheduleResolver,
     ],
@@ -33,7 +35,7 @@ async function startServer() {
     schema,
   });
 
-  const { url } = await server.listen(4000);
+  const { url } = await server.listen(process.env.PORT);
   console.log(`Yup: ${url}`);
 }
 
