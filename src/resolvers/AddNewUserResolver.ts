@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { Arg, Mutation, Resolver } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
+import { getStorage } from "firebase-admin/storage";
 import { randomBytes } from "crypto";
 
 import { AddUserModel } from "../dtos/model/AddUserModel";
@@ -16,6 +17,7 @@ dotenv.config();
 export class AddNewUserResolver {
   private firestore = getFirestore();
   private auth = getAuth();
+  private storage = getStorage().bucket(process.env.BUCKET);
 
   private generatePassword(length: number): string {
     const charset =
@@ -78,6 +80,10 @@ export class AddNewUserResolver {
           salary: salary || 0,
         });
       }
+
+      const folderPath = `users/${userRecord.uid}/profile`;
+      const file = this.storage.file(`${folderPath}/placeholder.txt`);
+      await file.save("This is a placeholder file to create the folder.");
 
       const [firstName] = name.split(" ");
       const currentYear = getCurrentYear();

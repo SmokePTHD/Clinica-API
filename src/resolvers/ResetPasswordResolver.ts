@@ -6,6 +6,7 @@ import { ResetPasswordInput } from "../dtos/inputs/ResetPasswordInput";
 import { ResetPassword } from "../dtos/model/ResetPasswordModel";
 
 import mg from "../config/mailer";
+import { getCurrentYear } from "../utils/dateUtils";
 
 dotenv.config();
 
@@ -20,6 +21,8 @@ export class ResetUsersPassword {
     try {
       const resetLink = await this.auth.generatePasswordResetLink(email);
 
+      const year = getCurrentYear();
+
       await mg.messages.create(process.env.MAIL_HOST, {
         from: `"Clínica Rio Este" <${process.env.MAIL_USER}>`,
         to: [email],
@@ -27,7 +30,7 @@ export class ResetUsersPassword {
         template: "reset password",
         "h:X-Mailgun-Variables": JSON.stringify({
           reset_password_link: resetLink,
-          year: "2025",
+          year: year,
         }),
       });
 
