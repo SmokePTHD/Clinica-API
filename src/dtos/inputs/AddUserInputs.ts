@@ -11,7 +11,7 @@ export class AddUserInputs {
   @Field()
   nif: number;
 
-  @Field()
+  @Field({ nullable: true })
   note: string;
 
   @Field()
@@ -28,4 +28,10 @@ export class AddUserInputs {
 
   @Field()
   sex: string;
+
+  @Field({ nullable: true })
+  percentage: number;
+
+  @Field({ nullable: true })
+  salary: number;
 }
