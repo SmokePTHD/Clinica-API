@@ -25,9 +25,7 @@ export class UserResolver {
       return {
         uid,
         address: userData?.address,
-        birthDate: userData?.birthDate?.toDate
-          ? userData.birthDate.toDate()
-          : null,
+        birthDate: userData?.birthDate?.toDate(),
         email: userData?.email,
         name: userData?.name,
         nif: userData?.nif,

@@ -10,4 +10,7 @@ export class GetUserByRole {
 
   @Field()
   name: string;
+
+  @Field()
+  clientcode: number;
 }

@@ -8,8 +8,8 @@ export class User {
   @Field()
   address: string;
 
-  @Field(() => Date, { nullable: true })
-  birthDate: Date | null;
+  @Field()
+  birthDate: Date;
 
   @Field()
   email: string;
