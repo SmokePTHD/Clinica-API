@@ -34,6 +34,7 @@ export class UserResolver {
         role: userData?.role,
         sex: userData?.sex,
         status: userData?.status,
+        profileImage: userData?.profileImage,
       };
     } catch (error: any) {
       throw new Error(`Erro ao buscar dados do utilizador: ${error.message}`);

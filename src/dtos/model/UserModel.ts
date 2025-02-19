@@ -34,4 +34,7 @@ export class User {
 
   @Field()
   status: string;
+
+  @Field()
+  profileImage: string;
 }
