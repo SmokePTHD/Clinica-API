@@ -44,6 +44,7 @@ export class AddNewUserResolver {
       role,
       percentage,
       salary,
+      sex,
     }: AddUserInputs
   ): Promise<AddUserModel> {
     try {
@@ -57,6 +58,11 @@ export class AddNewUserResolver {
 
       const userDoc = this.firestore.collection("users").doc(userRecord.uid);
 
+      let profileImage =
+        sex === "M"
+          ? "https://firebasestorage.googleapis.com/v0/b/clinica-rio-este.appspot.com/o/imagens%2FnoProfileM.jpg?alt=media&token=35125862-d467-48fc-9397-02bfc4656d1e"
+          : "https://firebasestorage.googleapis.com/v0/b/clinica-rio-este.appspot.com/o/imagens%2FnoProfileW.jpg?alt=media&token=bc49b717-3b3e-47a1-b8cc-29afabe8222d";
+
       if (role === "pacient") {
         await userDoc.set({
           address: address,
@@ -67,6 +73,8 @@ export class AddNewUserResolver {
           note: note,
           phone: phone,
           role: role,
+          status: "offline",
+          profileImage: profileImage,
         });
       } else {
         await userDoc.set({
@@ -76,14 +84,11 @@ export class AddNewUserResolver {
           name: name,
           phone: phone,
           role: role,
+          status: "offline",
           percentage: percentage || 0,
           salary: salary || 0,
         });
       }
-
-      const folderPath = `users/${userRecord.uid}/profile`;
-      const file = this.storage.file(`${folderPath}/placeholder.txt`);
-      await file.save("This is a placeholder file to create the folder.");
 
       const [firstName] = name.split(" ");
       const currentYear = getCurrentYear();
