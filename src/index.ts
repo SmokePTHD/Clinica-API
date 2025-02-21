@@ -11,6 +11,7 @@ import { GetUsersByRoleResolver } from "./resolvers/GetUsersByRoleResolver";
 import { AddNewUserResolver } from "./resolvers/AddNewUserResolver";
 import { AddNewScheduleResolver } from "./resolvers/AddNewScheduleResolver";
 import { GetUserProfilePictureResolver } from "./resolvers/GetUserProfilePictureResolver";
+import { UpdateUserProfileImageResolver } from "./resolvers/UpdateUserProfileImageResolver";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ async function startServer() {
       GetUserProfilePictureResolver,
       AddNewUserResolver,
       AddNewScheduleResolver,
+      UpdateUserProfileImageResolver,
     ],
   });
 

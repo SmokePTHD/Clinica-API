@@ -4,7 +4,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { v4 as uuidv4 } from "uuid";
 
 @Resolver()
-export class UploadResolver {
+export class UpdateUserProfileImageResolver {
   private storage = getStorage().bucket(process.env.BUCKET);
   private firestore = getFirestore();
 
