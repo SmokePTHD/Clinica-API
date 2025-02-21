@@ -1,7 +1,5 @@
 import "reflect-metadata";
-
 import dotenv from "dotenv";
-
 import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
 import { initializeFirebase } from "./config/firebase";

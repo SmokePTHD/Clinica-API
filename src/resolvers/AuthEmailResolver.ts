@@ -1,9 +1,11 @@
+import dotenv from "dotenv";
+import axios from "axios";
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 
 import { LoginEmailInput } from "../dtos/inputs/AuthEmailInput";
 import { LoginResponse } from "../dtos/model/AuthEmailModel";
 
-import axios from "axios";
+dotenv.config();
 
 @Resolver()
 export class AuthEmailResolver {
