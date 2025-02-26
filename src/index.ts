@@ -7,7 +7,7 @@ import { initializeFirebase } from "./config/firebase";
 import { AuthEmailResolver } from "./resolvers/AuthEmailResolver";
 import { ResetUsersPassword } from "./resolvers/ResetPasswordResolver";
 import { UserResolver } from "./resolvers/GetUserResolver";
-import { GetUsersByRoleResolver } from "./resolvers/GetUsersByRoleResolver";
+import { GetAllUsersByRoleResolver } from "./resolvers/GetUsersByRoleResolver";
 import { AddNewUserResolver } from "./resolvers/AddNewUserResolver";
 import { AddNewScheduleResolver } from "./resolvers/AddNewScheduleResolver";
 import { GetUserProfilePictureResolver } from "./resolvers/GetUserProfilePictureResolver";
@@ -21,7 +21,7 @@ async function startServer() {
       AuthEmailResolver,
       UserResolver,
       ResetUsersPassword,
-      GetUsersByRoleResolver,
+      GetAllUsersByRoleResolver,
       GetUserProfilePictureResolver,
       AddNewUserResolver,
       AddNewScheduleResolver,

@@ -2,9 +2,10 @@ import { Arg, Query, Resolver } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
 
 import { User } from "../dtos/model/UserModel";
+import { PaginatedUsersResponse } from "../dtos/model/PaginatedUsersResponseModel";
 
 @Resolver()
-export class GetUsersByRoleResolver {
+export class GetAllUsersByRoleResolver {
   private firestore = getFirestore();
 
   @Query(() => [User])
@@ -16,56 +17,50 @@ export class GetUsersByRoleResolver {
       return [];
     }
 
-    const users: User[] = [];
-    snapshot.forEach((doc) => {
-      const user = doc.data() as User;
-      user.uid = doc.id;
-      users.push(user);
-    });
-
-    return users;
+    return snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      uid: doc.id,
+    })) as User[];
   }
 
-  @Query(() => [User])
-  async getUsers(
+  @Query(() => PaginatedUsersResponse)
+  async getPaginatedUsers(
+    @Arg("role") role: string,
     @Arg("limit", { defaultValue: 10 }) limit: number,
-    @Arg("role") role: string
-  ): Promise<User[]> {
+    @Arg("cursor", { nullable: true }) cursor?: string
+  ): Promise<PaginatedUsersResponse> {
     try {
-      const usersSnapshot = await this.firestore
+      let query = this.firestore
         .collection("users")
         .where("role", "==", role)
-        .limit(limit)
-        .get();
+        .orderBy("name") // Garantir que o campo de ordenação seja correto
+        .limit(limit);
 
-      if (usersSnapshot.empty) {
-        throw new Error("Nenhum utilizador encontrado.");
+      if (cursor) {
+        const snapshot = await this.firestore
+          .collection("users")
+          .doc(cursor)
+          .get();
+
+        if (snapshot.exists) {
+          query = query.startAfter(snapshot.data()?.name); // Ou outro campo de ordenação
+        }
       }
 
-      const users: User[] = [];
-      usersSnapshot.forEach((doc) => {
-        const userData = doc.data();
-        users.push({
-          uid: doc.id,
-          address: userData.address,
-          birthDate: userData.birthDate?.toDate(),
-          email: userData.email,
-          name: userData.name,
-          nif: userData.nif,
-          note: userData.note,
-          phone: userData.phone,
-          role: userData.role,
-          sex: userData.sex,
-          status: userData.status,
-          profileImage: userData.profileImage,
-        });
-      });
+      const usersSnapshot = await query.get();
+      if (usersSnapshot.empty) return { users: [], lastCursor: null };
 
-      return users;
-    } catch (error: any) {
-      throw new Error(
-        `Erro ao buscar dados dos utilizadores: ${error.message}`
-      );
+      const users: User[] = usersSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        uid: doc.id,
+      })) as User[];
+
+      const lastCursor =
+        usersSnapshot.docs[usersSnapshot.docs.length - 1]?.id || null;
+
+      return { users, lastCursor };
+    } catch (error) {
+      throw new Error(`Erro ao buscar usuários: ${error.message}`);
     }
   }
 }
