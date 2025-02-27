@@ -33,7 +33,7 @@ export class GetAllUsersByRoleResolver {
       let query = this.firestore
         .collection("users")
         .where("role", "==", role)
-        .orderBy("name") // Garantir que o campo de ordenação seja correto
+        .orderBy("name")
         .limit(limit);
 
       if (cursor) {
@@ -43,7 +43,7 @@ export class GetAllUsersByRoleResolver {
           .get();
 
         if (snapshot.exists) {
-          query = query.startAfter(snapshot.data()?.name); // Ou outro campo de ordenação
+          query = query.startAfter(snapshot.data()?.name);
         }
       }
 

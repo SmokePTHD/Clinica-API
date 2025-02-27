@@ -12,6 +12,7 @@ import { AddNewUserResolver } from "./resolvers/AddNewUserResolver";
 import { AddNewScheduleResolver } from "./resolvers/AddNewScheduleResolver";
 import { GetUserProfilePictureResolver } from "./resolvers/GetUserProfilePictureResolver";
 import { UpdateUserProfileImageResolver } from "./resolvers/UpdateUserProfileImageResolver";
+import { GetOfficesResolver } from "./resolvers/GetOfficesResolver";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ async function startServer() {
       AddNewUserResolver,
       AddNewScheduleResolver,
       UpdateUserProfileImageResolver,
+      GetOfficesResolver,
     ],
   });
 
