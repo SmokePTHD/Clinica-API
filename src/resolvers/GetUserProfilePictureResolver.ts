@@ -7,7 +7,7 @@ import { GetUserProfilePictureInput } from "../dtos/inputs/GetUserProfilePicture
 dotenv.config();
 
 @Resolver()
-export class GetUserProfilePictureResolver {
+class GetUserProfilePictureResolver {
   private storage = getStorage().bucket(process.env.BUCKET);
 
   @Query(() => String)
@@ -41,3 +41,5 @@ export class GetUserProfilePictureResolver {
     return url;
   }
 }
+
+export default GetUserProfilePictureResolver;

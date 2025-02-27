@@ -5,7 +5,7 @@ import { User } from "../dtos/model/UserModel";
 import { PaginatedUsersResponse } from "../dtos/model/PaginatedUsersResponseModel";
 
 @Resolver()
-export class GetAllUsersByRoleResolver {
+class GetAllUsersByRoleResolver {
   private firestore = getFirestore();
 
   @Query(() => [User])
@@ -64,3 +64,5 @@ export class GetAllUsersByRoleResolver {
     }
   }
 }
+
+export default GetAllUsersByRoleResolver;

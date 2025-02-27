@@ -5,7 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { User } from "../dtos/model/UserModel";
 
 @Resolver()
-export class UserResolver {
+class UserResolver {
   private firestore = getFirestore();
 
   @Query(() => User)
@@ -41,3 +41,5 @@ export class UserResolver {
     }
   }
 }
+
+export default UserResolver;

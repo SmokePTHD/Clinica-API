@@ -8,7 +8,7 @@ import { LoginResponse } from "../dtos/model/AuthEmailModel";
 dotenv.config();
 
 @Resolver()
-export class AuthEmailResolver {
+class AuthEmailResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg("data") { email, password }: LoginEmailInput
@@ -40,3 +40,5 @@ export class AuthEmailResolver {
     return "Yup";
   }
 }
+
+export default AuthEmailResolver;

@@ -14,7 +14,7 @@ import mg from "../config/mailer";
 dotenv.config();
 
 @Resolver()
-export class AddNewUserResolver {
+class AddNewUserResolver {
   private firestore = getFirestore();
   private auth = getAuth();
   private storage = getStorage().bucket(process.env.BUCKET);
@@ -116,3 +116,5 @@ export class AddNewUserResolver {
     }
   }
 }
+
+export default AddNewUserResolver;

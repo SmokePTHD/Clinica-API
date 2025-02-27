@@ -11,7 +11,7 @@ import { getCurrentYear } from "../utils/dateUtils";
 dotenv.config();
 
 @Resolver()
-export class ResetUsersPassword {
+class ResetUsersPassword {
   private auth = getAuth();
 
   @Mutation(() => ResetPassword)
@@ -44,3 +44,5 @@ export class ResetUsersPassword {
     }
   }
 }
+
+export default ResetUsersPassword;

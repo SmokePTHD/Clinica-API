@@ -29,3 +29,5 @@ export class GetOfficesResolver {
     });
   }
 }
+
+export default GetOfficesResolver;

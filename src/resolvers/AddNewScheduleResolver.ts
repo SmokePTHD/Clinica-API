@@ -78,3 +78,5 @@ export class AddNewScheduleResolver {
     }
   }
 }
+
+export default AddNewScheduleResolver;
