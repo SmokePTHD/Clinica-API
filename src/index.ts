@@ -13,7 +13,7 @@ async function startServer() {
   const resolvers = Object.values(
     requireAll({
       dirname: path.join(__dirname, "resolvers"),
-      filter: /(.+Resolver)\.(ts)$/, // Suporte para TS e JS (caso uses build)
+      filter: /(.+Resolver)\.(ts)$/,
       resolve: (resolver) => resolver.default || resolver,
     })
   );

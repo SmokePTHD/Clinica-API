@@ -13,3 +13,5 @@ export function initializeFirebase() {
     databaseURL: process.env.DATABASE_URL,
   });
 }
+
+export { admin };
