@@ -77,6 +77,30 @@ class AuthResolver {
     }
   }
 
+  @Mutation(() => String)
+  async loginWithFacebook(
+    @Arg("accessToken") accessToken: string
+  ): Promise<string> {
+    try {
+      const response = await axios.get(
+        `https://graph.facebook.com/me?fields=id,email,name&access_token=${accessToken}`
+      );
+      const { id, email, name } = response.data;
+
+      if (!id) {
+        throw new Error("Erro ao obter informações do Facebook.");
+      }
+
+      const uid = `facebook:${id}`;
+
+      const customToken = await admin.auth().createCustomToken(uid);
+
+      return customToken;
+    } catch (error) {
+      throw new Error("Falha ao autenticar com Facebook.");
+    }
+  }
+
   @Mutation(() => Boolean)
   async linkGoogleAccount(
     @Arg("token") token: string,
@@ -96,6 +120,34 @@ class AuthResolver {
       return true;
     } catch (error) {
       throw new Error("Erro ao vincular conta Google.");
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async linkFacebookAccount(
+    @Arg("token") token: string,
+    @Arg("accessToken") accessToken: string
+  ): Promise<boolean> {
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      const uid = decodedToken.uid;
+
+      const response = await axios.get(
+        `https://graph.facebook.com/me?fields=id,email,name&access_token=${accessToken}`
+      );
+      const { id } = response.data;
+
+      if (!id) {
+        throw new Error("Erro ao obter informações do Facebook.");
+      }
+
+      await admin.auth().updateUser(uid, {
+        customClaims: { facebookLinked: true },
+      });
+
+      return true;
+    } catch (error) {
+      throw new Error("Erro ao vincular conta Facebook.");
     }
   }
 }
