@@ -26,7 +26,7 @@ class GetAllUsersByRoleResolver {
   @Query(() => PaginatedUsersResponse)
   async getPaginatedUsers(
     @Arg("role") role: string,
-    @Arg("limit", { defaultValue: 10 }) limit: number,
+    @Arg("limit", () => Number, { defaultValue: 10 }) limit: number,
     @Arg("cursor", { nullable: true }) cursor?: string
   ): Promise<PaginatedUsersResponse> {
     try {
@@ -50,10 +50,16 @@ class GetAllUsersByRoleResolver {
       const usersSnapshot = await query.get();
       if (usersSnapshot.empty) return { users: [], lastCursor: null };
 
-      const users: User[] = usersSnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        uid: doc.id,
-      })) as User[];
+      const users: User[] = usersSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          uid: doc.id,
+          birthDate: data.birthDate?._seconds
+            ? new Date(data.birthDate._seconds * 1000).toISOString()
+            : null,
+        };
+      }) as User[];
 
       const lastCursor =
         usersSnapshot.docs[usersSnapshot.docs.length - 1]?.id || null;
