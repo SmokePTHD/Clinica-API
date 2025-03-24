@@ -53,26 +53,34 @@ class AuthResolver {
     return oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: ["profile", "email"],
+      prompt: "consent",
     });
   }
 
   @Mutation(() => String)
   async loginWithGoogle(@Arg("code") code: string): Promise<string> {
     try {
-      const { tokens } = await oauth2Client.getToken(code);
-      const idToken = tokens.id_token;
+      console.log("Código recebido pela API:", code); // DEBUG
 
+      const { tokens } = await oauth2Client.getToken(code);
+      console.log("Tokens recebidos do Google:", tokens); // DEBUG
+
+      const idToken = tokens.id_token;
       if (!idToken) {
         throw new Error("Erro ao obter ID Token do Google.");
       }
 
+      console.log("ID Token do Google:", idToken); // DEBUG
+
       const decodedToken = await admin.auth().verifyIdToken(idToken);
-      const uid = decodedToken.uid;
+      console.log("UID do Firebase:", decodedToken.uid); // DEBUG
 
-      const customToken = await admin.auth().createCustomToken(uid);
-
+      const customToken = await admin
+        .auth()
+        .createCustomToken(decodedToken.uid);
       return customToken;
     } catch (error) {
+      console.error("Erro ao autenticar com Google:", error);
       throw new Error("Falha ao autenticar com Google.");
     }
   }

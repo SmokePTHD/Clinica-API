@@ -63,7 +63,7 @@ class AddNewUserResolver {
           ? "https://firebasestorage.googleapis.com/v0/b/clinica-rio-este.appspot.com/o/imagens%2FnoProfileM.jpg?alt=media&token=35125862-d467-48fc-9397-02bfc4656d1e"
           : "https://firebasestorage.googleapis.com/v0/b/clinica-rio-este.appspot.com/o/imagens%2FnoProfileW.jpg?alt=media&token=bc49b717-3b3e-47a1-b8cc-29afabe8222d";
 
-      if (role === "pacient") {
+      if (role === "patient") {
         await userDoc.set({
           address: address,
           birthDate: birthDate,

@@ -32,9 +32,14 @@ class GetAllUsersByRoleResolver {
     try {
       let query = this.firestore
         .collection("users")
-        .where("role", "==", role)
         .orderBy("name")
         .limit(limit);
+
+      if (role === "!=patient") {
+        query = query.where("role", "!=", "patient");
+      } else {
+        query = query.where("role", "==", role);
+      }
 
       if (cursor) {
         const snapshot = await this.firestore
