@@ -40,6 +40,36 @@ class UserResolver {
       throw new Error(`Erro ao buscar dados do utilizador: ${error.message}`);
     }
   }
+
+  @Query(() => User)
+  async getUserByUID(@Arg("UID") uid: string): Promise<User> {
+    try {
+      const userDoc = await this.firestore.collection("users").doc(uid).get();
+
+      if (!userDoc.exists) {
+        throw new Error("Utilizador não encontrado.");
+      }
+
+      const userData = userDoc.data();
+
+      return {
+        uid,
+        address: userData?.address,
+        birthDate: userData?.birthDate?.toDate(),
+        email: userData?.email,
+        name: userData?.name,
+        nif: userData?.nif,
+        note: userData?.note,
+        phone: userData?.phone,
+        role: userData?.role,
+        sex: userData?.sex,
+        status: userData?.status,
+        profileImage: userData?.profileImage,
+      };
+    } catch (error: any) {
+      throw new Error(`Erro ao buscar dados do utilizador: ${error.message}`);
+    }
+  }
 }
 
 export default UserResolver;
