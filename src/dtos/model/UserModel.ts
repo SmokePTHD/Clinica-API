@@ -18,6 +18,9 @@ export class User {
   name: string;
 
   @Field()
+  cc: string;
+
+  @Field()
   nif: number;
 
   @Field({ nullable: true })

@@ -3,6 +3,7 @@ import { getFirestore } from "firebase-admin/firestore";
 
 import { User } from "../dtos/model/UserModel";
 import { PaginatedUsersResponse } from "../dtos/model/PaginatedUsersResponseModel";
+import { UserFilterInput } from "../dtos/inputs/UserFilterInput";
 
 @Resolver()
 class GetAllUsersByRoleResolver {
@@ -25,7 +26,8 @@ class GetAllUsersByRoleResolver {
 
   @Query(() => PaginatedUsersResponse)
   async getPaginatedUsers(
-    @Arg("role") role: string,
+    @Arg("filter", () => UserFilterInput, { nullable: true })
+    filter?: UserFilterInput,
     @Arg("limit", () => Number, { defaultValue: 10 }) limit: number,
     @Arg("cursor", { nullable: true }) cursor?: string
   ): Promise<PaginatedUsersResponse> {
@@ -35,10 +37,24 @@ class GetAllUsersByRoleResolver {
         .orderBy("name")
         .limit(limit);
 
-      if (role === "!=patient") {
-        query = query.where("role", "!=", "patient");
-      } else {
-        query = query.where("role", "==", role);
+      if (filter) {
+        Object.keys(filter).forEach((key) => {
+          const value = filter[key as keyof UserFilterInput];
+          if (value !== undefined && value !== null) {
+            if (key === "role" && value === "!=patient") {
+              query = query.where("role", "!=", "patient");
+            } else if (key === "name") {
+              const words = value.split("*").map((word) => word.trim());
+              if (words.length > 0) {
+                query = query
+                  .where("name", ">=", words[0])
+                  .where("name", "<=", words[0] + "\uf8ff");
+              }
+            } else {
+              query = query.where(key, "==", value);
+            }
+          }
+        });
       }
 
       if (cursor) {
@@ -55,16 +71,24 @@ class GetAllUsersByRoleResolver {
       const usersSnapshot = await query.get();
       if (usersSnapshot.empty) return { users: [], lastCursor: null };
 
-      const users: User[] = usersSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          ...data,
-          uid: doc.id,
-          birthDate: data.birthDate?._seconds
-            ? new Date(data.birthDate._seconds * 1000).toISOString()
-            : null,
-        };
-      }) as User[];
+      const users: User[] = usersSnapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            uid: doc.id,
+            birthDate: data.birthDate?._seconds
+              ? new Date(data.birthDate._seconds * 1000).toISOString()
+              : null,
+          };
+        })
+        .filter((user) => {
+          if (filter?.name) {
+            const words = filter.name.split("*").map((word) => word.trim());
+            return words.every((word) => user.name.includes(word));
+          }
+          return true;
+        }) as User[];
 
       const lastCursor =
         usersSnapshot.docs[usersSnapshot.docs.length - 1]?.id || null;

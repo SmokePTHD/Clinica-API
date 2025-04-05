@@ -11,6 +11,9 @@ export class AddUserInputs {
   @Field()
   nif: number;
 
+  @Field()
+  cc: string;
+
   @Field({ nullable: true })
   note: string;
 
