@@ -8,7 +8,7 @@ dotenv.config();
 
 @Resolver()
 class GetUserProfilePictureResolver {
-  private storage = getStorage().bucket(process.env.BUCKET);
+  private storage = getStorage().bucket(process.env.BUCKET!);
 
   @Query(() => String)
   async getUserProfileImage(

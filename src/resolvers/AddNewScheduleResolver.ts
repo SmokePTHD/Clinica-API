@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Mutation, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 
@@ -7,6 +7,8 @@ import { AddScheduleModel } from "../dtos/model/AddScheduleModel";
 import { AddScheduleInputs } from "../dtos/inputs/AddScheduleInputs";
 
 import mg from "../config/mailer";
+import { AuthFirebase } from "../middleware/AuthFirebase";
+import { MyContext } from "../types/MyContext";
 
 dotenv.config();
 
@@ -16,6 +18,7 @@ export class AddNewScheduleResolver {
   private auth = getAuth();
 
   @Mutation(() => AddScheduleModel)
+  @UseMiddleware(AuthFirebase)
   async addNewSchedule(
     @Arg("data")
     {
@@ -26,7 +29,8 @@ export class AddNewScheduleResolver {
       dateEnd,
       note,
       status,
-    }: AddScheduleInputs
+    }: AddScheduleInputs,
+    @Ctx() context: MyContext
   ): Promise<AddScheduleModel> {
     try {
       const pacientDoc = await this.firestore
@@ -60,8 +64,8 @@ export class AddNewScheduleResolver {
         status,
       });
 
-      await mg.messages.create(process.env.MAIL_HOST, {
-        from: `"Clínica Rio Este" <${process.env.MAIL_USER}>`,
+      await mg.messages.create(process.env.MAIL_HOST!, {
+        from: `"Clínica Rio Este" <${process.env.MAIL_USER!}>`,
         to: [email],
         subject: "Foi adiciana uma nova consulta",
         text: `Foi adicionada uma nova consulta`,

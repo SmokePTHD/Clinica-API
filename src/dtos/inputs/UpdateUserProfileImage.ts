@@ -1,5 +1,5 @@
 import { Field, InputType } from "type-graphql";
-import { GraphQLUpload } from "graphql-upload";
+import GraphQLUpload from "graphql-upload";
 
 @InputType()
 export class UpdateUserProfileImageInputs {

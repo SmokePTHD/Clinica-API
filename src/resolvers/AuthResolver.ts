@@ -28,7 +28,7 @@ class AuthResolver {
   ): Promise<LoginResponse> {
     try {
       const response = await axios.post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY!}`,
         {
           email,
           password,
@@ -60,20 +60,20 @@ class AuthResolver {
   @Mutation(() => String)
   async loginWithGoogle(@Arg("code") code: string): Promise<string> {
     try {
-      console.log("Código recebido pela API:", code); // DEBUG
+      console.log("Código recebido pela API:", code); 
 
       const { tokens } = await oauth2Client.getToken(code);
-      console.log("Tokens recebidos do Google:", tokens); // DEBUG
+      console.log("Tokens recebidos do Google:", tokens);
 
       const idToken = tokens.id_token;
       if (!idToken) {
         throw new Error("Erro ao obter ID Token do Google.");
       }
 
-      console.log("ID Token do Google:", idToken); // DEBUG
+      console.log("ID Token do Google:", idToken);
 
       const decodedToken = await admin.auth().verifyIdToken(idToken);
-      console.log("UID do Firebase:", decodedToken.uid); // DEBUG
+      console.log("UID do Firebase:", decodedToken.uid);
 
       const customToken = await admin
         .auth()
@@ -121,7 +121,6 @@ class AuthResolver {
       await admin.auth().updateUser(uid, {
         providerToLink: {
           providerId: "google.com",
-          idToken,
         },
       });
 
@@ -149,8 +148,8 @@ class AuthResolver {
         throw new Error("Erro ao obter informações do Facebook.");
       }
 
-      await admin.auth().updateUser(uid, {
-        customClaims: { facebookLinked: true },
+      await admin.auth().setCustomUserClaims(uid, {
+        facebookLinked: true
       });
 
       return true;

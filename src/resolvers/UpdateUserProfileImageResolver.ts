@@ -1,17 +1,21 @@
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Mutation, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getStorage } from "firebase-admin/storage";
 import { getFirestore } from "firebase-admin/firestore";
 import { v4 as uuidv4 } from "uuid";
+import { AuthFirebase } from "../middleware/AuthFirebase";
+import { MyContext } from "../types/MyContext";
 
 @Resolver()
 class UpdateUserProfileImageResolver {
-  private storage = getStorage().bucket(process.env.BUCKET);
+  private storage = getStorage().bucket(process.env.BUCKET!);
   private firestore = getFirestore();
 
   @Mutation(() => String)
+  @UseMiddleware(AuthFirebase)
   async uploadProfilePicture(
     @Arg("file", () => String) fileBase64: string,
-    @Arg("userId") userId: string
+    @Arg("userId") userId: string,
+    @Ctx() context: MyContext
   ): Promise<string> {
     try {
       if (!fileBase64.startsWith("data:image")) {

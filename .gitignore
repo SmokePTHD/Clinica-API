@@ -1,11 +1,15 @@
-# Modules
-node_modules
+# Node modules
+node_modules/
 package-lock.json
 
-# Enviroment
+# Output build
+dist/
+
+# Environment variables
 .env
-.gitignore
+
+# Zipped files
 *.zip
 
-#KEY
+# Firebase config keys
 src/config/*.json

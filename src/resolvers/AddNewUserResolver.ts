@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Mutation, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
@@ -10,6 +10,8 @@ import { AddUserInputs } from "../dtos/inputs/AddUserInputs";
 import { getCurrentYear } from "../utils/dateUtils";
 
 import mg from "../config/mailer";
+import { AuthFirebase } from "../middleware/AuthFirebase";
+import { MyContext } from "../types/MyContext";
 
 dotenv.config();
 
@@ -17,7 +19,7 @@ dotenv.config();
 class AddNewUserResolver {
   private firestore = getFirestore();
   private auth = getAuth();
-  private storage = getStorage().bucket(process.env.BUCKET);
+  private storage = getStorage().bucket(process.env.BUCKET!);
 
   private generatePassword(length: number): string {
     const charset =
@@ -31,6 +33,7 @@ class AddNewUserResolver {
   }
 
   @Mutation(() => AddUserModel)
+  @UseMiddleware(AuthFirebase)
   async addNewUser(
     @Arg("data")
     {
@@ -46,7 +49,8 @@ class AddNewUserResolver {
       percentage,
       salary,
       sex,
-    }: AddUserInputs
+    }: AddUserInputs,
+    @Ctx() context: MyContext
   ): Promise<AddUserModel> {
     try {
       const password = this.generatePassword(12);
@@ -95,8 +99,8 @@ class AddNewUserResolver {
       const [firstName] = name.split(" ");
       const currentYear = getCurrentYear();
 
-      await mg.messages.create(process.env.MAIL_HOST, {
-        from: `"Clínica Rio Este" <${process.env.MAIL_USER}>`,
+      await mg.messages.create(process.env.MAIL_HOST!, {
+        from: `"Clínica Rio Este" <${process.env.MAIL_USER!}>`,
         to: [email],
         subject: "Bem-vindo à Clínica Rio Este",
         template: "create user",

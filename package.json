@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only src/index.ts"
+    "dev": "tsnd --respawn --transpile-only src/index.ts",
+    "build": "NODE_OPTIONS='--max-old-space-size=2048' tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "SmokePTHD",
@@ -18,17 +20,17 @@
     "googleapis": "^146.0.0",
     "graphql": "^16.10.0",
     "graphql-scalars": "^1.24.0",
+    "graphql-upload": "^11.0.0",
     "mailgun.js": "^11.1.0",
     "nodemailer": "^6.9.16",
     "reflect-metadata": "^0.2.2",
-    "require-all": "^3.0.0",
     "ts-node-dev": "^2.0.0",
     "type-graphql": "^2.0.0-rc.2",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
+    "@types/graphql-upload": "^17.0.0",
     "@types/nodemailer": "^6.4.17",
-    "@types/require-all": "^3.0.6",
     "@types/uuid": "^10.0.0"
   }
 }

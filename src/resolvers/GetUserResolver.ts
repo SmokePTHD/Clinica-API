@@ -1,19 +1,20 @@
-import { Arg, Query, Resolver } from "type-graphql";
+import { Arg, Query, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
 import { User } from "../dtos/model/UserModel";
+import { AuthFirebase } from "../middleware/AuthFirebase";
+import { MyContext } from "../types/MyContext";
 
 @Resolver()
 class UserResolver {
   private firestore = getFirestore();
 
   @Query(() => User)
-  async getUser(@Arg("token") token: string): Promise<User> {
+  @UseMiddleware(AuthFirebase)
+  async getUser(@Ctx() context: MyContext): Promise<User> {
     try {
-      const decodedToken = await getAuth().verifyIdToken(token);
-      const uid = decodedToken.uid;
-
+      const uid = context.user.uid;
       const userDoc = await this.firestore.collection("users").doc(uid).get();
 
       if (!userDoc.exists) {
@@ -43,6 +44,7 @@ class UserResolver {
   }
 
   @Query(() => User)
+  @UseMiddleware(AuthFirebase)
   async getUserByUID(@Arg("UID") uid: string): Promise<User> {
     try {
       const userDoc = await this.firestore.collection("users").doc(uid).get();
