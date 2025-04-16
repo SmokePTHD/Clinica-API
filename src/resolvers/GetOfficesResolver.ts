@@ -1,7 +1,9 @@
 import { Query, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
+
 import { GetOffices } from "../dtos/model/GetOfficesModel";
-import { AuthFirebase } from "../middleware/AuthFirebase";
+
+import { RoleGuard } from "../middleware/RoleGuard";
 import { MyContext } from "../types/MyContext";
 
 @Resolver()
@@ -9,7 +11,7 @@ export class GetOfficesResolver {
   private firestore = getFirestore();
 
   @Query(() => [GetOffices])
-  @UseMiddleware(AuthFirebase)
+  @UseMiddleware(RoleGuard(["recepsionist", "manager", "ceo"]))
   async getOffices(@Ctx() context: MyContext): Promise<GetOffices[]> {
     const officesRef = this.firestore.collection("offices");
     const snapshot = await officesRef.get();

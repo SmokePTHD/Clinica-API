@@ -6,19 +6,16 @@ export class AddScheduleInputs {
   office: number;
 
   @Field()
-  pacient: string;
+  patient: string;
 
   @Field()
-  doctor: string;
+  dentist: string;
 
   @Field()
   dateStart: Date;
 
   @Field()
   dateEnd: Date;
-
-  @Field()
-  note: string;
 
   @Field()
   status: string;

@@ -23,11 +23,10 @@ export class AddNewScheduleResolver {
     @Arg("data")
     {
       office,
-      pacient,
-      doctor,
+      patient,
+      dentist,
       dateStart,
       dateEnd,
-      note,
       status,
     }: AddScheduleInputs,
     @Ctx() context: MyContext
@@ -35,7 +34,7 @@ export class AddNewScheduleResolver {
     try {
       const pacientDoc = await this.firestore
         .collection("users")
-        .doc(pacient)
+        .doc(patient)
         .get();
 
       if (!pacientDoc.exists) {
@@ -56,11 +55,10 @@ export class AddNewScheduleResolver {
 
       await scheduleDoc.set({
         office,
-        pacient,
-        doctor,
+        patient,
+        dentist,
         dateStart,
         dateEnd,
-        note,
         status,
       });
 

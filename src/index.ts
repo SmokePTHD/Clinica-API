@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
-import { ApolloServer } from "apollo-server";
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 
 import { initializeFirebase } from "./config/firebase";
@@ -39,21 +40,31 @@ async function startServer() {
         ],
     validate: false,
   });
-  
 
   initializeFirebase();
+
+  const app = express();
+
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://api.desenvolvimentoclinicarioeste.pt");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    next();
+  });
 
   const server = new ApolloServer({
     schema,
     context: ({ req }) => ({ req }),
-    cors: {
-      origin: ["https://api.desenvolvimentoclinicarioeste.pt"],
-      credentials: true,
-    },
   });
 
-  const { url } = await server.listen(process.env.PORT!);
-  console.log(`Yup: ${url}`);
+  await server.start();
+  server.applyMiddleware({ app, path: "/graphql" });
+
+  const PORT = process.env.PORT!;
+  app.listen(PORT, () => {
+    console.log(`Yup: https://api.desenvolvimentoclinicarioeste.pt/graphql`);
+  });
 }
 
 startServer();
