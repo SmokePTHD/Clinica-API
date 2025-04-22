@@ -14,7 +14,7 @@ export class GetSchedulesResolver {
   async getSchedulesByInterval(
     @Arg("data") data: SchedulesIntervalInput
   ): Promise<Schedule[]> {
-    const { dateStart, dateEnd } = data;
+    const { dateStart, dateEnd, office } = data;
 
     const startTimestamp = Timestamp.fromDate(new Date(dateStart));
     const endTimestamp = Timestamp.fromDate(new Date(dateEnd));
@@ -23,6 +23,7 @@ export class GetSchedulesResolver {
       .collection("schedules")
       .where("dateStart", "<=", endTimestamp)
       .where("dateEnd", ">=", startTimestamp)
+      .where("office", "==", office)
       .get();
 
     return snapshot.docs.map((doc) => {

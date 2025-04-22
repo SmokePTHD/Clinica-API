@@ -7,4 +7,7 @@ export class SchedulesIntervalInput {
 
   @Field()
   dateEnd: string;
+
+  @Field()
+  office: number;
 }

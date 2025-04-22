@@ -28,7 +28,8 @@ class AuthResolver {
   ): Promise<LoginResponse> {
     try {
       const response = await axios.post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY!}`,
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process
+          .env.FIREBASE_API_KEY!}`,
         {
           email,
           password,
@@ -60,25 +61,30 @@ class AuthResolver {
   @Mutation(() => String)
   async loginWithGoogle(@Arg("code") code: string): Promise<string> {
     try {
-      console.log("Código recebido pela API:", code); 
-
       const { tokens } = await oauth2Client.getToken(code);
-      console.log("Tokens recebidos do Google:", tokens);
-
       const idToken = tokens.id_token;
+
       if (!idToken) {
         throw new Error("Erro ao obter ID Token do Google.");
       }
 
-      console.log("ID Token do Google:", idToken);
-
       const decodedToken = await admin.auth().verifyIdToken(idToken);
-      console.log("UID do Firebase:", decodedToken.uid);
+      const uid = decodedToken.uid;
 
-      const customToken = await admin
-        .auth()
-        .createCustomToken(decodedToken.uid);
-      return customToken;
+      // 👉 Faz login com custom token para obter ID token
+      const customToken = await admin.auth().createCustomToken(uid);
+
+      const loginRes = await axios.post(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${process.env.FIREBASE_API_KEY}`,
+        {
+          token: customToken,
+          returnSecureToken: true,
+        }
+      );
+
+      const finalIdToken = loginRes.data.idToken;
+
+      return finalIdToken; // Este sim será o token que o front usa
     } catch (error) {
       console.error("Erro ao autenticar com Google:", error);
       throw new Error("Falha ao autenticar com Google.");
@@ -111,21 +117,34 @@ class AuthResolver {
 
   @Mutation(() => Boolean)
   async linkGoogleAccount(
-    @Arg("token") token: string,
-    @Arg("idToken") idToken: string
+    @Arg("token") firebaseToken: string,
+    @Arg("googleIdToken") googleIdToken: string
   ): Promise<boolean> {
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const uid = decodedToken.uid;
+      // Verifica o utilizador atual
+      const currentUser = await admin.auth().verifyIdToken(firebaseToken);
+      const uid = currentUser.uid;
 
-      await admin.auth().updateUser(uid, {
-        providerToLink: {
-          providerId: "google.com",
-        },
+      // Verifica o ID Token do Google
+      const googleUser = await admin.auth().verifyIdToken(googleIdToken);
+      const googleEmail = googleUser.email;
+
+      if (!googleEmail) {
+        throw new Error("Email da conta Google não encontrado.");
+      }
+
+      // Aqui, opcionalmente, podes verificar se o email do Google é o mesmo que o do Firebase
+
+      // Atualiza custom claims (ou apenas anota que foi vinculado)
+      await admin.auth().setCustomUserClaims(uid, {
+        ...currentUser.claims,
+        googleLinked: true,
+        googleEmail,
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Erro ao vincular conta Google:", error);
       throw new Error("Erro ao vincular conta Google.");
     }
   }
@@ -149,7 +168,7 @@ class AuthResolver {
       }
 
       await admin.auth().setCustomUserClaims(uid, {
-        facebookLinked: true
+        facebookLinked: true,
       });
 
       return true;
