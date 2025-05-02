@@ -13,3 +13,6 @@ dist/
 
 # Firebase config keys
 src/config/*.json
+
+# Script to update
+update.sh
