@@ -19,7 +19,6 @@ dotenv.config();
 class AddNewUserResolver {
   private firestore = getFirestore();
   private auth = getAuth();
-  private storage = getStorage().bucket(process.env.BUCKET!);
 
   private generatePassword(length: number): string {
     const charset =
@@ -77,9 +76,9 @@ class AddNewUserResolver {
           cc: cc,
           nif: nif,
           note: note,
+          sex: sex,
           phone: phone,
           role: role,
-          status: "offline",
           profileImage: profileImage,
         });
       } else {
@@ -89,8 +88,9 @@ class AddNewUserResolver {
           email: email,
           name: name,
           phone: phone,
+          sex: sex,
           role: role,
-          status: "offline",
+          status: 0,
           percentage: percentage || 0,
           salary: salary || 0,
         });

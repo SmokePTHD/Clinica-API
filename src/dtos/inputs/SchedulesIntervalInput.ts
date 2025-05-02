@@ -11,3 +11,12 @@ export class SchedulesIntervalInput {
   @Field()
   office: number;
 }
+
+@InputType()
+export class DentistSchedulesIntervalInput {
+  @Field()
+  dateStart: string;
+
+  @Field()
+  dateEnd: string;
+}

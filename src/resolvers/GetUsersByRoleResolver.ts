@@ -38,11 +38,14 @@ class GetAllUsersByRoleResolver {
     @Arg("limit", () => Number, { defaultValue: 10 }) limit: number,
     @Arg("offset", () => Number, { nullable: true }) offset?: number,
     @Arg("cursor", () => String, { nullable: true }) cursor?: string,
-    @Arg("filter", () => UserFilterInput, { nullable: true }) filter?: UserFilterInput,
-  ): Promise<PaginatedUsersResponse>
-   {
+    @Arg("filter", () => UserFilterInput, { nullable: true })
+    filter?: UserFilterInput
+  ): Promise<PaginatedUsersResponse> {
     try {
-      let query = this.firestore.collection("users").orderBy("name").limit(limit);
+      let query = this.firestore
+        .collection("users")
+        .orderBy("name")
+        .limit(limit);
 
       if (filter) {
         Object.keys(filter).forEach((key) => {
@@ -53,7 +56,9 @@ class GetAllUsersByRoleResolver {
             } else if (key === "name") {
               const words = value.split("*").map((word) => word.trim());
               if (words.length > 0) {
-                query = query.where("name", ">=", words[0]).where("name", "<=", words[0] + "\uf8ff");
+                query = query
+                  .where("name", ">=", words[0])
+                  .where("name", "<=", words[0] + "\uf8ff");
               }
             } else {
               query = query.where(key, "==", value);
@@ -63,7 +68,10 @@ class GetAllUsersByRoleResolver {
       }
 
       if (cursor) {
-        const snapshot = await this.firestore.collection("users").doc(cursor).get();
+        const snapshot = await this.firestore
+          .collection("users")
+          .doc(cursor)
+          .get();
         if (snapshot.exists) {
           query = query.startAfter(snapshot.data()?.name);
         }
@@ -103,7 +111,8 @@ class GetAllUsersByRoleResolver {
           return true;
         });
 
-      const lastCursor = usersSnapshot.docs[usersSnapshot.docs.length - 1]?.id || null;
+      const lastCursor =
+        usersSnapshot.docs[usersSnapshot.docs.length - 1]?.id || null;
 
       return { users, lastCursor: lastCursor ?? undefined };
     } catch (error) {

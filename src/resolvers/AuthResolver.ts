@@ -1,9 +1,10 @@
 import dotenv from "dotenv";
 import axios from "axios";
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Mutation, Query, Resolver, Ctx } from "type-graphql";
 import { google } from "googleapis";
 
 import { admin } from "../config/firebase";
+import { MyContext } from "../types/MyContext";
 
 import { LoginResponse } from "../dtos/model/AuthEmailModel";
 import { LoginEmailInput } from "../dtos/inputs/AuthEmailInput";
@@ -175,6 +176,15 @@ class AuthResolver {
     } catch (error) {
       throw new Error("Erro ao vincular conta Facebook.");
     }
+  }
+
+  @Mutation(() => String, { nullable: true })
+  async verifyFirebaseToken(@Ctx() ctx: MyContext): Promise<string | null> {
+    if (!ctx.user) {
+      throw new Error("Não autenticado");
+    }
+
+    return ctx.user.uid;
   }
 }
 

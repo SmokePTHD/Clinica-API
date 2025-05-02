@@ -18,5 +18,5 @@ export class AddScheduleInputs {
   dateEnd: Date;
 
   @Field()
-  status: string;
+  status: number;
 }
