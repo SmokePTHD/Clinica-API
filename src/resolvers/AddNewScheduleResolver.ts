@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import { Arg, Mutation, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
-import { getAuth } from "firebase-admin/auth";
 import { v4 as uuidv4 } from "uuid";
 
 import { AddScheduleModel } from "../dtos/model/AddScheduleModel";
@@ -42,8 +41,7 @@ export class AddNewScheduleResolver {
         throw new Error("Email do paciente não encontrado.");
       }
 
-      const scheduleId = new Date().toISOString();
-
+      const scheduleId = uuidv4();
       const confirmToken = uuidv4();
 
       const scheduleDoc = this.firestore
@@ -87,6 +85,7 @@ export class AddNewScheduleResolver {
       return {
         success: true,
         message: "A consulta foi adicionada com sucesso",
+        id: scheduleId, // <-- devolve o ID ao front-end
       };
     } catch (error) {
       console.error("Erro ao adicionar novo agendamento:", error);

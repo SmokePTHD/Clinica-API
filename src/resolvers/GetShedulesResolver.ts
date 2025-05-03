@@ -1,4 +1,11 @@
-import { Arg, Query, Resolver, UseMiddleware, Ctx } from "type-graphql";
+import {
+  Arg,
+  Query,
+  Mutation,
+  Resolver,
+  UseMiddleware,
+  Ctx,
+} from "type-graphql";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
 import { RoleGuard } from "../middleware/RoleGuard";
@@ -10,6 +17,10 @@ import {
   SchedulesIntervalInput,
   DentistSchedulesIntervalInput,
 } from "../dtos/inputs/SchedulesIntervalInput";
+import {
+  SchedulesChangeStatusInput,
+  FinalizeScheduleInput,
+} from "../dtos/inputs/SchedulesChangeStatusInput";
 
 @Resolver()
 export class GetSchedulesResolver {
@@ -32,13 +43,17 @@ export class GetSchedulesResolver {
       .get();
 
     return snapshot.docs.map((doc) => {
-      const { dateStart, dateEnd, ...rest } = doc.data();
+      const data = doc.data();
 
       return {
-        ...rest,
-        dateStart: (dateStart as Timestamp).toDate().toISOString(),
-        dateEnd: (dateEnd as Timestamp).toDate().toISOString(),
-      } as Schedule;
+        id: doc.id,
+        patient: data.patient,
+        dentist: data.dentist,
+        office: data.office,
+        status: data.status,
+        dateStart: (data.dateStart as Timestamp).toDate().toISOString(),
+        dateEnd: (data.dateEnd as Timestamp).toDate().toISOString(),
+      };
     });
   }
 
@@ -62,13 +77,59 @@ export class GetSchedulesResolver {
       .get();
 
     return snapshot.docs.map((doc) => {
-      const { dateStart, dateEnd, ...rest } = doc.data();
+      const data = doc.data();
 
       return {
-        ...rest,
-        dateStart: (dateStart as Timestamp).toDate().toISOString(),
-        dateEnd: (dateEnd as Timestamp).toDate().toISOString(),
-      } as Schedule;
+        id: doc.id,
+        patient: data.patient,
+        dentist: data.dentist,
+        office: data.office,
+        status: data.status,
+        dateStart: (data.dateStart as Timestamp).toDate().toISOString(),
+        dateEnd: (data.dateEnd as Timestamp).toDate().toISOString(),
+      };
     });
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(AuthFirebase, RoleGuard(["ceo", "receptionist", "manager"]))
+  async updateScheduleStatus(
+    @Arg("data") data: SchedulesChangeStatusInput
+  ): Promise<boolean> {
+    const { scheduleId, newStatus } = data;
+
+    const scheduleRef = await this.firestore
+      .collection("schedules")
+      .doc(scheduleId);
+
+    await scheduleRef.update({ status: newStatus });
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(AuthFirebase, RoleGuard(["receptionist", "manager", "ceo"]))
+  async finalizeSchedule(
+    @Arg("data") data: FinalizeScheduleInput
+  ): Promise<boolean> {
+    const { scheduleId, price, paymentMethod, installments } = data;
+
+    const scheduleRef = this.firestore.collection("schedules").doc(scheduleId);
+    const scheduleDoc = await scheduleRef.get();
+
+    if (!scheduleDoc.exists) {
+      throw new Error("Consulta não encontrada");
+    }
+
+    const currentStatus = scheduleDoc.data()?.status;
+
+    await scheduleRef.update({
+      status: 5,
+      price,
+      paymentMethod,
+      installments: paymentMethod === 3 ? installments ?? 1 : null,
+      finalizedAt: new Date().toISOString(),
+    });
+
+    return true;
   }
 }

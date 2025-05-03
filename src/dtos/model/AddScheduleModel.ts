@@ -7,4 +7,7 @@ export class AddScheduleModel {
 
   @Field()
   message: string;
+  
+  @Field()
+  scheduleId: string;
 }

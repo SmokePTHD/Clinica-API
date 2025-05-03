@@ -2,21 +2,24 @@ import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class Schedule {
-    @Field()
-    dateStart: string;
-    
-    @Field()
-    dateEnd: string;
-    
-    @Field()
-    office: number;
+  @Field()
+  id: string;
 
-    @Field()
-    patient: string;
+  @Field()
+  dateStart: string;
 
-    @Field()
-    dentist: string;
-    
-    @Field()
-    status: string;
+  @Field()
+  dateEnd: string;
+
+  @Field()
+  office: number;
+
+  @Field()
+  patient: string;
+
+  @Field()
+  dentist: string;
+
+  @Field()
+  status: string;
 }
