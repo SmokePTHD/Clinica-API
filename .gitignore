@@ -16,3 +16,6 @@ src/config/*.json
 
 # Script to update
 update.sh
+
+# Uploads folder
+uploads/
