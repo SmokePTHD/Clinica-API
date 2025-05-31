@@ -1,0 +1,17 @@
+[
+  { "title": "Ano Novo", "date": "01-01", "type": "nacional" },
+  { "title": "25 de Abril", "date": "04-25", "type": "nacional" },
+  { "title": "Dia do Trabalhador", "date": "05-01", "type": "nacional" },
+  { "title": "Dia de Portugal", "date": "06-10", "type": "nacional" },
+  { "title": "São João", "date": "06-24", "type": "municipal" },
+  { "title": "Assunção de Nossa Senhora", "date": "08-15", "type": "nacional" },
+  { "title": "Implantação da República", "date": "10-05", "type": "nacional" },
+  { "title": "Todos os Santos", "date": "11-01", "type": "nacional" },
+  {
+    "title": "Restauração da Independência",
+    "date": "12-01",
+    "type": "nacional"
+  },
+  { "title": "Imaculada Conceição", "date": "12-08", "type": "nacional" },
+  { "title": "Natal", "date": "12-25", "type": "nacional" }
+]
