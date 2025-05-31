@@ -3,19 +3,13 @@ import { Field, InputType } from "type-graphql";
 @InputType()
 export class AddUserInputs {
   @Field()
-  address: string;
-
-  @Field()
   birthDate: Date;
 
   @Field()
   nif: number;
 
-  @Field()
-  cc: string;
-
   @Field({ nullable: true })
-  note: string;
+  iban: string;
 
   @Field()
   phone: string;

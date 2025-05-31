@@ -21,5 +21,14 @@ export class Schedule {
   dentist: string;
 
   @Field()
-  status: string;
+  status: number;
+
+  @Field({ nullable: true })
+  price?: number;
+
+  @Field({ nullable: true })
+  paymentMethod?: number;
+
+  @Field({ nullable: true })
+  installments?: number;
 }

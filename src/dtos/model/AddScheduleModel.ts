@@ -9,5 +9,5 @@ export class AddScheduleModel {
   message: string;
   
   @Field()
-  scheduleId: string;
+  id: string;
 }

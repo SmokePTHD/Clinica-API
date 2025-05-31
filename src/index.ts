@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
 import express from "express";
+import path from "node:path";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 
@@ -44,6 +45,8 @@ async function startServer() {
   initializeFirebase();
 
   const app = express();
+
+  app.use("/images", express.static(path.join(__dirname, "..", "uploads/app")));
 
   app.use((req, res, next) => {
     res.setHeader(

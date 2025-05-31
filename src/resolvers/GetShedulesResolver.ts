@@ -1,3 +1,4 @@
+import moment from "moment";
 import {
   Arg,
   Query,
@@ -11,6 +12,7 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { RoleGuard } from "../middleware/RoleGuard";
 import { AuthFirebase } from "../middleware/AuthFirebase";
 import { MyContext } from "../types/MyContext";
+import { KpiResolver } from "./KpiResolver";
 
 import { Schedule } from "../dtos/model/ScheduleModel";
 import {
@@ -120,7 +122,10 @@ export class GetSchedulesResolver {
       throw new Error("Consulta não encontrada");
     }
 
-    const currentStatus = scheduleDoc.data()?.status;
+    const scheduleData = scheduleDoc.data();
+    const dentist = scheduleData?.dentist;
+    const dateEnd: Date = (scheduleData?.dateEnd as Timestamp).toDate();
+    const revenueDate = moment(dateEnd).format("YYYY-MM-DD");
 
     await scheduleRef.update({
       status: 5,
@@ -130,6 +135,70 @@ export class GetSchedulesResolver {
       finalizedAt: new Date().toISOString(),
     });
 
+    const revenueRef = this.firestore.collection("revenues").doc(revenueDate);
+    await this.firestore.runTransaction(async (t) => {
+      const revenueSnap = await t.get(revenueRef);
+      const data = revenueSnap.exists
+        ? revenueSnap.data()!
+        : {
+            total: 0,
+            dentists: {},
+            createdAt: Timestamp.now(),
+          };
+
+      data.total += price;
+      data.dentists[dentist] = (data.dentists[dentist] || 0) + price;
+
+      t.set(revenueRef, data);
+    });
+
+    const year = dateEnd.getFullYear();
+    const month = dateEnd.getMonth();
+    const kpiService = new KpiResolver();
+    await kpiService.addRevenueToKpi(year, month, price);
+    await kpiService.incrementConsultas(year, month);
+
     return true;
+  }
+
+  @Query(() => [Schedule])
+  @UseMiddleware(AuthFirebase, RoleGuard(["receptionist", "manager", "ceo"]))
+  async getUserSchedules(@Arg("uid") uid: string): Promise<Schedule[]> {
+    const snapshot = await this.firestore
+      .collection("schedules")
+      .where("patient", "==", uid)
+      .get();
+
+    const schedules = await Promise.all(
+      snapshot.docs.map(async (doc) => {
+        const data = doc.data();
+
+        let dentistName = "N/D";
+        if (data.dentist) {
+          const dentistDoc = await this.firestore
+            .collection("users")
+            .doc(data.dentist)
+            .get();
+          if (dentistDoc.exists) {
+            dentistName = dentistDoc.data()?.name || "N/D";
+          }
+        }
+
+        return {
+          id: doc.id,
+          patient: data.patient,
+          dentist: dentistName, 
+          office: data.office,
+          status: data.status,
+          dateStart: (data.dateStart as Timestamp).toDate().toISOString(),
+          dateEnd: (data.dateEnd as Timestamp).toDate().toISOString(),
+          price: data.price ?? null,
+          paymentMethod: data.paymentMethod ?? null,
+          installments: data.installments ?? null,
+        };
+      })
+    );
+
+    return schedules;
   }
 }

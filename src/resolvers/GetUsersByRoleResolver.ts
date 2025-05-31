@@ -95,7 +95,7 @@ class GetAllUsersByRoleResolver {
             phone: data.phone || "",
             gender: data.gender || "",
             role: data.role || "",
-            status: data.status || "",
+            status: data.status || 0,
             profileImage: data.profileImage || "",
             sex: data.sex || "",
             birthDate: data.birthDate?._seconds

@@ -85,7 +85,7 @@ export class AddNewScheduleResolver {
       return {
         success: true,
         message: "A consulta foi adicionada com sucesso",
-        id: scheduleId, // <-- devolve o ID ao front-end
+        id: scheduleId,
       };
     } catch (error) {
       console.error("Erro ao adicionar novo agendamento:", error);

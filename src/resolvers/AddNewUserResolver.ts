@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import { Arg, Mutation, Resolver, UseMiddleware, Ctx } from "type-graphql";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
-import { getStorage } from "firebase-admin/storage";
 import { randomBytes } from "crypto";
 
 import { AddUserModel } from "../dtos/model/AddUserModel";
@@ -12,6 +11,7 @@ import { getCurrentYear } from "../utils/dateUtils";
 import mg from "../config/mailer";
 import { AuthFirebase } from "../middleware/AuthFirebase";
 import { MyContext } from "../types/MyContext";
+import { KpiResolver } from "./KpiResolver";
 
 dotenv.config();
 
@@ -36,13 +36,11 @@ class AddNewUserResolver {
   async addNewUser(
     @Arg("data")
     {
-      address,
       birthDate,
       email,
       name,
-      cc,
+      iban,
       nif,
-      note,
       phone,
       role,
       percentage,
@@ -67,33 +65,54 @@ class AddNewUserResolver {
           ? "https://firebasestorage.googleapis.com/v0/b/clinica-rio-este.appspot.com/o/imagens%2FnoProfileM.jpg?alt=media&token=35125862-d467-48fc-9397-02bfc4656d1e"
           : "https://firebasestorage.googleapis.com/v0/b/clinica-rio-este.appspot.com/o/imagens%2FnoProfileW.jpg?alt=media&token=bc49b717-3b3e-47a1-b8cc-29afabe8222d";
 
-      if (role === "patient") {
-        await userDoc.set({
-          address: address,
-          birthDate: birthDate,
-          email: email,
-          name: name,
-          cc: cc,
-          nif: nif,
-          note: note,
-          sex: sex,
-          phone: phone,
-          role: role,
-          profileImage: profileImage,
-        });
-      } else {
-        await userDoc.set({
-          address: address,
-          birthDate: birthDate,
-          email: email,
-          name: name,
-          phone: phone,
-          sex: sex,
-          role: role,
-          status: 0,
-          percentage: percentage || 0,
-          salary: salary || 0,
-        });
+      switch (role) {
+        case "patient":
+          await userDoc.set({
+            birthDate: birthDate,
+            email: email,
+            name: name,
+            nif: nif,
+            sex: sex,
+            phone: phone,
+            role: role,
+            profileImage: profileImage,
+          });
+          break;
+
+        case "dentist":
+          await userDoc.set({
+            iban: iban,
+            birthDate: birthDate,
+            email: email,
+            name: name,
+            phone: phone,
+            sex: sex,
+            role: role,
+            status: 0,
+            percentage: percentage || 0,
+          });
+
+        default:
+          await userDoc.set({
+            iban: iban,
+            birthDate: birthDate,
+            email: email,
+            name: name,
+            phone: phone,
+            sex: sex,
+            role: role,
+            status: 0,
+            salary: salary || 0,
+          });
+      }
+
+      if (["patient", "dentist"].includes(role)) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+
+        const kpiService = new KpiResolver();
+        await kpiService.updateKpiUsersCount(year, month);
       }
 
       const [firstName] = name.split(" ");
